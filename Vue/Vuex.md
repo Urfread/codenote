@@ -146,3 +146,97 @@ createApp(App).use(store).mount('#app');
 </script>
 ```
 
+
+
+## 扩展
+
+### 持久化
+
+页面刷新时，数据依然在，而不是一刷新就没了
+
+```js
+// store/index.js
+import { createStore } from 'vuex';
+
+export default createStore({
+  state: {
+    count: Number(localStorage.getItem('count')) || 0 // 初始化时从localStorage读取count值
+  },
+  mutations: {
+    increment(state) {
+      state.count++;
+      localStorage.setItem('count', state.count); // 更新localStorage中的count值
+    },
+    decrement(state) {
+      state.count--;
+      localStorage.setItem('count', state.count); // 更新localStorage中的count值
+    }
+  }
+});
+```
+
+
+
+### 模拟监听
+
+```js
+<!-- Add.vue -->
+<template>
+    <div>
+      <button @click="increment">+</button>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    name: 'Add',
+    methods: {
+      increment() {
+        this.$store.commit('increment');
+        this.$store.dispatch('checkAndTrigger');//检查是否达到触发条件
+      }
+    }
+  };
+  </script>
+```
+
+
+
+```js
+// store/index.js
+import { createStore } from 'vuex';
+
+export default createStore({
+  state: {
+    count: Number(localStorage.getItem('count')) || 0 // 初始化时从localStorage读取count值
+  },
+  mutations: {
+    increment(state) {
+      state.count++;
+      localStorage.setItem('count', state.count); // 更新localStorage中的count值
+    },
+    decrement(state) {
+      state.count--;
+      localStorage.setItem('count', state.count); // 更新localStorage中的count值
+    }
+  },
+  getters: {
+    // 计算属性：判断是否达到了触发条件
+    isCountFive: (state) => {
+      return state.count === 5;
+    }
+  },
+  actions: {
+    // 触发特定条件时的操作
+    checkAndTrigger({ state, getters, commit }) {
+      if (getters.isCountFive) {
+        // 这里可以放你想要触发的操作，比如打印一条消息或调用一个函数
+        alert('Count has reached 5! Performing the trigger action...');
+        // 你也可以在这里触发其他的 mutation 或 action
+        // commit('someMutation');
+      }
+    }
+  }
+});
+```
+
