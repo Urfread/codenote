@@ -19,8 +19,8 @@ import java.lang.reflect.Proxy;
 }
 // 定义服务接口
 interface MyService {
-    @SayBefore
-    @SayAfter
+    @SayBefore("Hello")
+    @SayAfter("Bye")
     void doSomething();
 }
 
