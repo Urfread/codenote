@@ -1,5 +1,3 @@
-
-
 ## 在GitHub上创建一个专门用于保存算法笔记的新分支：
 
 1. **克隆仓库**： 首先，你需要将GitHub上的仓库克隆到本地。打开终端或命令提示符，然后使用以下命令：
@@ -51,4 +49,37 @@
 
 
 ## .gitignore
+
+```bash
+# 排除 IntelliJ IDEA 的文件和文件夹
+.idea/
+*.iml
+*.iws
+out/
+*.log
+*.ipr
+
+# 排除 VS Code 的文件和文件夹
+.vscode/
+.history/
+
+# 排除 Java 编译生成的 class 文件和相关文件夹
+*.class
+*.jar
+*.war
+*.ear
+*.dll
+*.so
+*.exe
+target/
+bin/
+
+# 排除操作系统相关文件
+.DS_Store
+Thumbs.db
+# 排除Python编译生成的文件
+*.spec
+dist/
+build/
+```
 
