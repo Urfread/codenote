@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Template</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-right: 1px solid #ddd;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #444;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+        }
+
+        .note-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .note-actions {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+
+        .note-actions button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav">
+            <div class="logo">My Website</div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Sidebar</h2>
+            <ul>
+                <li><a href="./index.html">复习页</a></li>
+                <li><a href="./insert_note.html">录入新笔记</a></li>
+                <li><a href="./show_notes.html">管理笔记</a></li>
+                <li><a href="./output_notes.html">导出笔记</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div id="notes-list"></div>
+        </main>
+    </div>
+    <script>
+        let notesData = [];
+
+        // Load notes from localStorage
+        function loadNotes() {
+            notesData = JSON.parse(localStorage.getItem('notes')) || [];
+            displayNotes();
+        }
+
+        // Display the notes
+        function displayNotes() {
+            const notesList = document.getElementById('notes-list');
+            notesList.innerHTML = ''; // Clear existing content
+
+            notesData.forEach((note, index) => {
+                const noteItem = document.createElement('div');
+                noteItem.className = 'note-item';
+
+                noteItem.innerHTML = `
+                    <p><strong>问题:</strong> ${note.question}</p>
+                    <p><strong>答案:</strong> ${note.answer}</p>
+                    <div class="note-actions">
+                        <button onclick="editNote(${index})">修改</button>
+                        <button onclick="deleteNote(${index})">删除</button>
+                    </div>
+                `;
+
+                notesList.appendChild(noteItem);
+            });
+        }
+
+        // Edit a note
+        function editNote(index) {
+            const newQuestion = prompt('输入新的问题:', notesData[index].question);
+            const newAnswer = prompt('输入新的答案:', notesData[index].answer);
+
+            if (newQuestion !== null && newAnswer !== null) {
+                notesData[index].question = newQuestion;
+                notesData[index].answer = newAnswer;
+                saveNotes();
+                displayNotes();
+            }
+        }
+
+        // Delete a note
+        function deleteNote(index) {
+            if (confirm('确定要删除这个笔记吗?')) {
+                notesData.splice(index, 1);
+                saveNotes();
+                displayNotes();
+            }
+        }
+
+        // Save notes to localStorage
+        function saveNotes() {
+            localStorage.setItem('notes', JSON.stringify(notesData));
+        }
+
+        // Load notes when the page is loaded
+        window.onload = loadNotes;
+    </script>
+</body>
+
+</html>

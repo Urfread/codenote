@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Notes</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-right: 1px solid #ddd;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #444;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+        }
+
+        .controls {
+            margin-bottom: 15px;
+        }
+
+        .controls button {
+            margin-right: 10px;
+            padding: 5px 10px;
+        }
+
+        #notes-json {
+            width: 80%;
+            height: 500px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav">
+            <div class="logo">My Website</div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Sidebar</h2>
+            <ul>
+                <li><a href="./index.html">复习页</a></li>
+                <li><a href="./insert_note.html">录入新笔记</a></li>
+                <li><a href="./show_notes.html">管理笔记</a></li>
+                <li><a href="./output_notes.html">导出笔记</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div class="controls">
+                <button id="modify-btn">修改</button>
+                <button id="save-btn" disabled>保存</button>
+                <button id="copy-btn">复制</button>
+                <button id="sort-btn">排序</button>
+            </div>
+            <textarea id="notes-json" readonly></textarea>
+        </main>
+    </div>
+    <script>
+        let notesData = [];
+
+        // Load notes from localStorage
+        function loadNotes() {
+            notesData = JSON.parse(localStorage.getItem('notes')) || [];
+            displayNotes();
+        }
+
+        // Display the notes in JSON format
+        function displayNotes() {
+            const notesJson = document.getElementById('notes-json');
+            notesJson.value = JSON.stringify(notesData, null, 2);
+        }
+
+        // Enable editing of the notes JSON
+        function modifyNotes() {
+            const notesJson = document.getElementById('notes-json');
+            notesJson.removeAttribute('readonly');
+            document.getElementById('save-btn').disabled = false;
+            document.getElementById('modify-btn').disabled = true;
+        }
+
+        // Save the modified notes to localStorage
+        function saveNotes() {
+            const notesJson = document.getElementById('notes-json');
+            try {
+                notesData = JSON.parse(notesJson.value);
+                localStorage.setItem('notes', JSON.stringify(notesData));
+                notesJson.setAttribute('readonly', true);
+                document.getElementById('save-btn').disabled = true;
+                alert('保存成功');
+            } catch (error) {
+                alert('JSON格式错误，请检查后再试');
+            }
+            document.getElementById('modify-btn').disabled = false;
+        }
+
+        // 修改 copyToClipboard 函数，使用新的提示方式
+        function copyToClipboard() {
+            const notesJson = document.getElementById('notes-json');
+            notesJson.select();
+            document.execCommand('copy');
+            showCopySuccessMessage();
+        }
+        // 显示复制成功的提示消息
+        function showCopySuccessMessage() {
+            // 创建一个提示消息元素
+            const message = document.createElement('div'); // 创建一个 <div> 元素，用于显示提示消息
+            message.textContent = '已复制到剪贴板'; // 设置提示消息的文本内容
+
+            // 设置提示消息的样式
+            message.style.position = 'fixed'; // 使用固定定位，使消息固定在屏幕的一侧
+            message.style.top = '60px'; // 设置消息距离屏幕顶部60px
+            message.style.right = '100px'; // 设置消息距离屏幕右侧100px
+            message.style.padding = '10px 20px'; // 设置消息内容的内边距
+            message.style.backgroundColor = '#4caf50'; // 设置消息的背景颜色为绿色（成功提示颜色）
+            message.style.color = '#fff'; // 设置消息的文本颜色为白色
+            message.style.borderRadius = '5px'; // 设置消息的边框圆角半径为5px，使其外观更友好
+            message.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)'; // 设置消息的阴影，使其更具立体感
+            message.style.zIndex = '1000'; // 设置z-index值，确保消息显示在最前面，不被其他元素遮挡
+
+            // 将消息元素添加到页面的 <body> 中，显示在页面上
+            document.body.appendChild(message);
+
+            // 定义颜色数组用于颜色变化
+            const colors = ['#4caf50', '#ff5722', '#3f51b5', '#e91e63', '#00bcd4'];
+            let colorIndex = 0;
+
+            // 设置定时器来改变背景颜色
+            const colorInterval = setInterval(() => {
+                colorIndex = (colorIndex + 1) % colors.length; // 循环颜色数组
+                message.style.backgroundColor = colors[colorIndex];
+            }, 200); // 每50毫秒更改一次颜色
+
+            // 设置一个定时器，1秒后自动移除提示消息
+            setTimeout(() => {
+                document.body.removeChild(message); // 从 <body> 中移除消息元素，隐藏消息
+                clearInterval(colorInterval); // 停止颜色变化
+            }, 1000); // 1000毫秒（即1秒）后执行
+        }
+
+
+        isDescending = false;
+        // Sort notes in descending order
+        function sortNotes() {
+            isDescending = !isDescending;
+            notesData.reverse();
+            displayNotes();
+            // 持久化
+            localStorage.setItem('notes', JSON.stringify(notesData));
+        }
+
+        // Set up event listeners
+        document.getElementById('modify-btn').addEventListener('click', modifyNotes);
+        document.getElementById('save-btn').addEventListener('click', saveNotes);
+        document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
+        document.getElementById('sort-btn').addEventListener('click', sortNotes);
+
+        // Load notes when the page is loaded
+        window.onload = loadNotes;
+    </script>
+</body>
+
+</html>
