@@ -1,2 +1,26 @@
-# 需要被忽略的文件
-# 自己手写
+# 排除 IntelliJ IDEA 的文件和文件夹
+.idea/
+*.iml
+*.iws
+out/
+*.log
+*.ipr
+
+# 排除 VS Code 的文件和文件夹
+.vscode/
+.history/
+
+# 排除 Java 编译生成的 class 文件和相关文件夹
+*.class
+*.jar
+*.war
+*.ear
+*.dll
+*.so
+*.exe
+target/
+bin/
+
+# 排除操作系统相关文件
+.DS_Store
+Thumbs.db

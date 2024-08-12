@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Template</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-right: 1px solid #ddd;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #444;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+        }
+
+        .buttons {
+            border: 1px solid black;
+            width: 100%;
+            height: 15%;
+        }
+
+        .question-box {
+            border: 1px solid #a06060;
+            width: 100%;
+            height: 20%;
+        }
+
+        .answer-box {
+            border: 1px solid #60a06a;
+            width: 100%;
+            height: 50%;
+            padding: 10px 10px 10px 10px;
+        }
+
+        #answer-content {
+            border: 1px solid #60a06a;
+            width: 100%;
+        }
+
+        #answer-input {
+            border: 1px solid #60a06a;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav">
+            <div class="logo">My Website</div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Sidebar</h2>
+            <ul>
+                <li><a href="./index.html">复习页</a></li>
+                <li><a href="./insert_note.html">录入新笔记</a></li>
+                <li><a href="./show_notes.html">管理笔记</a></li>
+                <li><a href="./output_notes.html">导出笔记</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div class="buttons">
+                <button id="prev-btn">上一个</button>
+                <button id="next-btn">下一个</button>
+                <button id="show-answer" onclick="showAnswer()">展示答案</button>
+                <button id="try-input" onclick="tryInput()">录入答案</button>
+            </div>
+            <div class="question-box">
+                <p id="question-content"></p>
+            </div>
+            <div class="answer-box">
+                <textarea id="answer-input" cols="30" rows="10"></textarea>
+                <p id="answer-content""></p>
+            </div>
+        </main>
+    </div>
+    <script>
+        let currentIndex = 0;
+        let questionsData = [];
+        let isShowingAnswer = false;
+        // 声明并调用一个方法
+        (function () {
+            document.getElementById('answer-input').style.display = 'none';
+            document.getElementById('answer-content').style.display = 'none';
+        })()
+
+        // Fetch or load questions data
+        async function loadQuestions() {
+            try {
+                // 先尝试从本地存储获取数据
+                questionsData = JSON.parse(localStorage.getItem('notes'));
+
+                // 如果本地存储中没有数据，则从服务器获取
+                if (!questionsData || questionsData.length === 0) {
+                    const response = await fetch('notes.json');
+                    questionsData = await response.json();
+
+                    // 将获取到的数据存储到本地存储中
+                    localStorage.setItem('notes', JSON.stringify(questionsData));
+                }
+
+                // 显示第一个问题
+                displayQuestion();
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
+        }
+
+
+        // Display the current question and answer
+        function displayQuestion() {
+            if (questionsData.length === 0) return;
+            const question = questionsData[currentIndex];
+            document.getElementById('question-content').innerText = question.question;
+        }
+
+        // 显示答案的函数
+        function showAnswer() {
+            
+            const question = questionsData[currentIndex];
+            // 判断是否已经展示
+            if (isShowingAnswer) {
+                document.getElementById('answer-content').style.display = 'none';
+                isShowingAnswer = false;
+            } else {
+                // 使用转义函数处理答案内容
+                document.getElementById('answer-content').innerText = question.answer;
+                isShowingAnswer = true;
+                document.getElementById('answer-content').style.display = 'block';
+            }
+        }
+        isShowingInput = false;
+        // 显示输入框的函数
+        function tryInput() {
+            if (!isShowingInput) {
+                // 如果之前在输入则隐藏输入框
+                isShowingInput = true
+                document.getElementById('answer-input').style.display = 'block';
+            } else {
+                // 如果之前没有在输入则显示输入框
+                isShowingInput = false
+                document.getElementById('answer-input').style.display = 'none';
+            }
+        }
+
+        // Show previous question
+        function showPrevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                console.log(currentIndex)
+                if (isShowingAnswer) {
+                    // 如果答案已经展示，则隐藏
+                    document.getElementById('answer-content').style.display = 'none';
+                    isShowingAnswer = false;
+
+                }
+                displayQuestion();
+            }
+        }
+
+        // Show next question
+        function showNextQuestion() {
+            if (currentIndex < questionsData.length - 1) {
+                if (isShowingAnswer) {
+                    // 如果答案已经展示，则隐藏
+                    document.getElementById('answer-content').style.display = 'none';
+                    isShowingAnswer = false;
+                }
+                currentIndex++;
+                displayQuestion();
+            }
+        }
+
+        // Set up event listeners
+        document.getElementById('prev-btn').addEventListener('click', showPrevQuestion);
+        document.getElementById('next-btn').addEventListener('click', showNextQuestion);
+        // Load questions when the page is loaded
+        window.onload = loadQuestions;
+    </script>
+</body>
+
+</html>

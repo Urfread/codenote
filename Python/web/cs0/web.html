@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Client</title>
+</head>
+<body>
+    <h1>Send Request to Server</h1>
+    <!-- 按钮用于触发请求 -->
+    <button id="sendRequestBtn">Send Request</button>
+    <!-- 用于显示服务器响应的元素 -->
+    <div id="responseContainer"></div>
+
+    <script>
+        // 获取按钮和响应容器的DOM元素
+        const button = document.getElementById('sendRequestBtn');
+        const responseContainer = document.getElementById('responseContainer');
+
+        // 为按钮添加点击事件监听器
+        button.addEventListener('click', function() {
+            fetch('http://localhost:8000/')  // 假设服务器运行在本地的8000端口
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();  // 假设服务器响应的是JSON
+                    }
+                    throw new Error('Network response was not ok.');
+                })
+                .then(data => {
+                    console.log('Server Response:', data);
+                    responseContainer.innerHTML = 'Server Response: ' + data.message;
+                })
+                .catch(error => {
+                    responseContainer.innerHTML = 'Error: ' + error.message;
+                });
+        });
+    </script>
+</body>
+</html>
