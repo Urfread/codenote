@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+>
+<!-- 定义Wheel bean -->
+<bean id="wheel" class="com.example.Wheel">
+    <property name="type" value="All-Season"/>
+</bean>
+
+<!-- 定义Car bean，并通过构造函数注入Wheel bean -->
+<bean id="car" class="com.example.Car">
+    <!-- 使用构造函数注入name属性 -->
+    <constructor-arg value="Toyota"/>
+    <!-- 使用构造函数注入wheel属性 -->
+    <constructor-arg ref="wheel"/>
+</bean>
+</beans>
